@@ -27,4 +27,13 @@ module.exports = {
       res.json(error);
     }
   },
+  getUserById: async (req, res) => {
+    const { userId } = req.params;
+    try {
+      const user = await User.findById(userId);
+      res.json(user);
+    } catch (error) {
+      res.json(error);
+    }
+  },
 };
