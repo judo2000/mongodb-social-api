@@ -23,4 +23,14 @@ module.exports = {
       console.log(error);
     }
   },
+  getAllThoughts: async (req, res) => {
+    try {
+      const thoughts = await Thought.find().populate({
+        path: "username",
+      });
+      res.json(thoughts);
+    } catch (error) {
+      res.json(error);
+    }
+  },
 };
