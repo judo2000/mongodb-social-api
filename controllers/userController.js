@@ -36,4 +36,31 @@ module.exports = {
       res.json(error);
     }
   },
+  updateUserById: async (req, res) => {
+    const { userId } = req.params;
+    try {
+      console.log(userId);
+      console.log(req.body.email);
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { ...req.body },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      res.json(updatedUser);
+    } catch (error) {
+      res.json(error);
+    }
+  },
+  deleteUserById: async (req, res) => {
+    const { userId } = req.params;
+    try {
+      const deletedUser = await User.findByIdAndDelete(userId);
+      res.json(deletedUser);
+    } catch (error) {
+      res.json(error);
+    }
+  },
 };
