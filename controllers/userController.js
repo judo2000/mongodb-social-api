@@ -1,5 +1,5 @@
 const { isEmail } = require("validator");
-const { User } = require("../model");
+const { User, Thought } = require("../model");
 
 module.exports = {
   createUser: async (req, res) => {
@@ -21,7 +21,14 @@ module.exports = {
   },
   getAllUsers: async (req, res) => {
     try {
-      const users = await User.find();
+      const users = await User.find()
+        .populate({
+          path: "thoughts",
+          select: "-__v",
+        })
+        .select("-__v")
+        .sort({ _id: -1 });
+
       res.json(users);
     } catch (error) {
       res.json(error);
@@ -50,6 +57,39 @@ module.exports = {
         }
       );
       res.json(updatedUser);
+    } catch (error) {
+      res.json(error);
+    }
+  },
+  addFriend: async (req, res) => {
+    const { userId, friendId } = req.params;
+    try {
+      const user1 = await User.findOneAndUpdate(
+        { _id: userId },
+        { $push: { friends: friendId } },
+        { new: true, runValidators: true }
+      ).populate({
+        path: "friends",
+        select: "-__v",
+      });
+      const user2 = await User.findOneAndUpdate(
+        { _id: friendId },
+        { $push: { friends: userId } },
+        { new: true, runValidators: true }
+      )
+        .populate({
+          path: "friends",
+          select: "-__v",
+        })
+
+        .select("-__v")
+        .then((userData) => {
+          if (!userData) {
+            res.status(404).json({ message: "No User found with this id!" });
+            return;
+          }
+          res.json(userData);
+        });
     } catch (error) {
       res.json(error);
     }

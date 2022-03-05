@@ -33,4 +33,13 @@ module.exports = {
       res.json(error);
     }
   },
+  getThoughtById: async (req, res) => {
+    const { thoughtId } = req.params;
+    try {
+      const thought = await Thought.findById(thoughtId);
+      res.json(thought);
+    } catch (error) {
+      res.json(error);
+    }
+  },
 };
