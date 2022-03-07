@@ -46,8 +46,6 @@ module.exports = {
   updateUserById: async (req, res) => {
     const { userId } = req.params;
     try {
-      console.log(userId);
-      console.log(req.body.email);
       const updatedUser = await User.findByIdAndUpdate(
         userId,
         { ...req.body },
@@ -99,6 +97,39 @@ module.exports = {
     try {
       const deletedUser = await User.findByIdAndDelete(userId);
       res.json(deletedUser);
+    } catch (error) {
+      res.json(error);
+    }
+  },
+  removeFriend: async (req, res) => {
+    const { userId, friendId } = req.params;
+    try {
+      const user1 = await User.findOneAndUpdate(
+        { _id: userId },
+        { $pull: { friends: friendId } },
+        { new: true }
+      ).populate({
+        path: "friends",
+        select: "-__v",
+      });
+      const user2 = await User.findOneAndUpdate(
+        { _id: friendId },
+        { $pull: { friends: userId } },
+        { new: true, runValidators: true }
+      )
+        .populate({
+          path: "friends",
+          select: "-__v",
+        })
+
+        .select("-__v")
+        .then((userData) => {
+          if (!userData) {
+            res.status(404).json({ message: "No User found with this id!" });
+            return;
+          }
+          res.json(userData);
+        });
     } catch (error) {
       res.json(error);
     }
