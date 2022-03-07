@@ -94,7 +94,11 @@ module.exports = {
   },
   deleteUserById: async (req, res) => {
     const { userId } = req.params;
+
     try {
+      const deleteUserThoughts = await Thought.deleteMany({
+        userId: userId,
+      });
       const deletedUser = await User.findByIdAndDelete(userId);
       res.json(deletedUser);
     } catch (error) {

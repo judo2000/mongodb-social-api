@@ -7,6 +7,7 @@ module.exports = {
       const newThought = await Thought.create({
         thoughtText,
         username,
+        userId,
       })
         .then(({ _id }) => {
           return User.findOneAndUpdate(
