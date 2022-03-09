@@ -59,6 +59,52 @@ module.exports = {
       res.json(error);
     }
   },
+  addReaction: async (req, res) => {
+    try {
+      const thought = await Thought.findOneAndUpdate(
+        { _id: req.params.thoughtId },
+        { $push: { reactions: req.body } }
+      )
+        .populate({
+          path: "reactions",
+          select: "-__v",
+        })
+        .select("-__v")
+        .then((userData) => {
+          if (!userData) {
+            res.status(404).json({ message: "No Thought found with this id!" });
+            return;
+          }
+          res.json(userData);
+        });
+    } catch (error) {
+      res.json(error);
+    }
+  },
+
+  removeReaction: async (req, res) => {
+    try {
+      const thought = await Thought.findOneAndUpdate(
+        { _id: req.params.thoughtId },
+        { $pull: { reactions: { reactionId: req.params.reactionId } } }
+      )
+        .populate({
+          path: "reactions",
+          select: "-__v",
+        })
+        .select("-__v")
+        .then((userData) => {
+          if (!userData) {
+            res.status(404).json({ message: "No Thought found with this id!" });
+            return;
+          }
+          res.json(userData);
+        });
+    } catch (error) {
+      res.json(error);
+    }
+  },
+
   deleteThoughtById: async (req, res) => {
     const { thoughtId } = req.params;
     try {
